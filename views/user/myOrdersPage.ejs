@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/myOrdersPage.css">
+  </head>
+
+  <body>
+    <%- include('../partials/userNav') %>
+
+    <div class="container" id="orders">
+      <% if (locals.myOrderedProdects.length>0 ) { %> 
+      <% myOrderedProdects.forEach(order=> { %>
+
+      <div class="order_container <%= order.status %>" id="<%= order.order_id %>">
+        <p
+          id="status-<%= order.order_id %>"
+          style="
+            text-align: end;
+            font-size: large;
+            margin: 5px;
+            color: rgb(13, 122, 218);
+          "
+        >
+          Order Status: <%=order.status %>
+        </p>
+        <p>Name:<%= order.name %></p>
+        <img src="<%= order.image %>" alt="qwertyuiop" width="150px" height="150px" />
+        <p>Description: <%= order.description%></p>
+        <p>Quantity <%= order.quantity %></p>
+        <p>Total Price: $<%= order.total_amount %></p>
+         <!-- <p >Payment Status: <%#= (order.payment_status==0)?'pending':'success' %></p>  -->
+        <p>Payment Mode: <%= order.payment_mode %></p>
+
+        <% const orderDate=new Date(order.order_date); const deliveryDate=new
+        Date(orderDate); deliveryDate.setDate(orderDate.getDate() + 3); %>
+        <p>
+          Order Date: <%= orderDate.toLocaleDateString('en-US', { year:
+          'numeric' , month: 'long' ,day: 'numeric' }) %>
+        </p>
+        <% if (order.status=='pending') { %>
+         <p id="exp-del-<%= order.order_id %>">
+          Expected Delivery Date: <%= deliveryDate?.toLocaleDateString('en-US', {year:
+          'numeric' , month: 'numeric' , day: 'numeric' }) %>
+        </p>
+        <% } else if(order.status=='cancelled'){ %>
+         <p id="exp-del-<%= order.order_id %>">
+          Cancelled On: <%= order.cancel_date %>
+        </p>
+        <% } else if(order.status=='delivered'){ %>
+         <p id="exp-del-<%= order.order_id %>">
+          Delivery Date: <%= order.delivery_date.toLocaleDateString('en-US', {year:
+          'numeric' , month: 'numeric' , day: 'numeric' }) %>
+        </p>
+        <% } %>
+        <% if (order.status=='pending' ) { %>
+        <button
+          onclick="cancelOrder(`<%= order.order_id %>`)"
+          class="cancel-details-button"
+          id="btn-<%= order.order_id %>"
+        >
+          Cancel
+        </button>
+        <% } %>
+
+        <label style="display: none;" for="cancel_reason">Reason for Cancel</label>
+          <textarea name="cancel_reason" style="resize: none;display: none;" id="cancel_reason_<%= order.order_id %>" cols="30" rows="5"></textarea>
+
+         <!-- <button   class="viewDescription-button" id="viewDescription-<%#= order.order_id %>">View-Description</button>  -->
+      </div>
+      <% }) %> <% } else { %>
+      <p>No Request Yet</p>
+      <% } %>
+    </div>
+    
+    <div id="reason" class="container" style="display: none;">
+      <div class="form">
+        <label for="" style="margin-bottom: 10px">Tell us why are you cancelling:</label>
+        <textarea name="reason" id="reasontext" cols="30" rows="10"></textarea>
+        <p style="color: red" id="reason_err"></p>
+        <button id="cancelBtn" class="action_btn" style="margin: 20px; align-self: center">Cancel Order</button>
+      </div>
+    </div>
+
+
+    <script>
+       const links=document.querySelectorAll('.navbar a');
+   links.forEach((link) => {
+    if(link.innerHTML == 'My-Orders'){
+      console.log('object')
+      link.setAttribute('class','active');
+      return;
+    }
+  });
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get the elements
+        const viewDescriptionButtons = document.querySelectorAll(
+          ".viewDescription-button"
+        );
+        const popUp = document.querySelector(".pop-up");
+
+        // Add click event listeners to each "View-Description" button
+        viewDescriptionButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            // Get the order container associated with the button
+            const orderContainer = this.closest(".order_container");
+            console.log(orderContainer);
+
+            // Get the user details from the order container
+
+            //   const gst_no = orderContainer.querySelector('p:nth-child(12)').textContent;
+
+            // Populate the popup with user details
+            popUp.innerHTML = `
+      <div class="popup-content">
+        <h2>User Details</h2>
+        <p>${name}</p>
+        <p>${gender}</p>
+        <p>${email}</p>
+        <p>${mobile_no}</p>
+        <p>${dob}</p>
+        <p>${business_name}</p>
+        <p>${business_address}</p>
+        <p>${aadhar_no}</p>
+        <p>${pan_no}</p>
+        <p>${gst_no}</p>
+        Aadhar-Image<img src="${aadhar_image}"/>
+        Pan-Image<img src="${pan_image}"/>
+        Profile-Image<img src="${profile_image}"/>
+        Store-Image<img src="${store_image}"/>
+
+      </div>
+      <button class="close-button">Close</button>
+    `;
+
+            // Show the popup
+            popUp.style.display = "block";
+
+            // Add click event listener to the close button
+            const closeButton = popUp.querySelector(".close-button");
+            closeButton.addEventListener("click", function () {
+              // Hide the popup when the close button is clicked
+              popUp.style.display = "none";
+            });
+          });
+        });
+          });
+     
+
+      //  async function handleOrderCancel(id){
+      //     console.log(typeof(id));
+      //     const textContainer=document.getElementById(`cancel_reason_${id}`);
+      //     console.log(textContainer);
+      //     textContainer.style.display='block';
+      //     const response =await cancelOrder(id);
+      //     const data=await response.json();
+      //     if(data.affectedRows>0){
+      //         const orderStatus=document.getElementById(`status-${id}`);
+      //         const deleteButton=document.getElementById(`cancel-${id}`);
+      //         deleteButton.style.display='none';
+      //         orderStatus.innerText='Order Status: cancelled';
+      //         console.log( orderStatus.parentElement);
+      //         orderStatus.parentElement.
+      //         classList.remove('pending')
+      // orderStatus.parentElement.classList.add('cancelled');    }
+      //     console.log(data);
+
+      //  }
+      const cancel_button = document.getElementById("cancelBtn");
+      const reasonWindow = document.getElementById("reason");
+      const allOrders = document.getElementById("orders");
+      const reason = document.getElementById("reasontext");
+      const reasonErr = document.getElementById("reason_err");
+      reason.addEventListener("keyup", (e) => {
+        if (reason.value.trim().length < 10) {
+          reasonErr.innerText = "Reason must be specified";
+        } else {
+          reasonErr.innerText = "";
+        }
+      });
+
+      function cancelOrder(id) {
+        const cancel_date=new Date();
+        console.log(id);
+        reasonWindow.style.display = "flex";
+        cancel_button.addEventListener("click", (e) => {
+          if (reason.value.trim().length < 10) {
+            alert("A reason must to given before cancelling the item.");
+            return false;
+          }
+          console.log(id);
+          fetch("/user/order/cancel/" + id, {
+            method: "PUT",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({ reason: reason.value,cancel_date }),
+          })
+          .then(res=> res.json())
+            .then((result) => {
+              console.log(result);
+              if (result.affectedRows>0) {
+                reason.value = "";
+                alert("Order Cancelled successfully !");
+                reasonWindow.style.display = "none";
+              const orderStatus=document.getElementById(`status-${id}`);
+              // const deleteButton=document.getElementById(`cancel-${id}`);
+              // deleteButton.style.display='none';
+              orderStatus.innerText='Order Status: cancelled';
+              console.log( orderStatus.parentElement);
+              orderStatus.parentElement.
+              classList.remove('pending')
+      orderStatus.parentElement.classList.add('cancelled');   
+                document.getElementById("exp-del-" + id).innerText =
+                  "Cancelled on: " + new Date().toLocaleDateString();
+                document.getElementById("status-" + id).innerText =
+                  "Order Status: cancelled";
+                const btn = document.getElementById(`btn-${id}`);
+                btn.remove();
+              } else {
+                alert("Order Not Found !");
+              }
+            })
+            .catch((err) => {
+              alert("Something went wrong !");
+              console.log(err);
+            });
+        });
+      }
+
+  
+  
+  
+      // async function cancelOrder(id){
+      //     return await fetch(`/user/order/cancel/${id}`,{
+      //         method:'put',
+      //     });
+      // }
+     
+    </script>
+  </body>
+</html>

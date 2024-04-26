@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/nav.css">
+  <style>
+    * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.content-div {
+    width: 96%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Use repeat to simplify column layout */
+    margin: 10px auto;
+    grid-gap: 2%;
+    overflow: auto; /* Enable vertical scrolling when needed */
+}
+
+.cart-item {
+    height: auto; /* Allow variable height based on content */
+    width: 18vw;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 1px 4px black;
+}
+
+.p-image {
+    height: 60%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Hide image overflow */
+}
+
+.p-title,
+.p-price,
+.p-quan,
+.action-div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: auto; /* Allow variable height based on content */
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center; /* Vertically center the content */
+}
+
+.p-title h2,
+.p-price p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.p-quan,
+.action-div {
+    height: auto; /* Allow variable height based on content */
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center; /* Vertically center the content */
+}
+
+.delete-button {
+    height: auto; /* Allow variable height based on content */
+    width: 45%;
+    background-color: black;
+    color: white;
+    font-size: 18px;
+}
+
+.decrement-quantity,
+.increment-quantity {
+    height: auto; /* Allow variable height based on content */
+    width: 20%;
+    background-color: dodgerblue;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+}
+#buy-now{
+    width: 60px;
+    height: 30px;
+    background-color: aqua;
+    color: black;
+}
+.billing-container{
+    text-align: center;
+}
+
+
+  </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+    <div class="content-div" id="content-div">
+        <% if (locals.cartItems) { %>
+            <% cartItems.forEach(product => { %>
+                <div id="<%= product.id %>" class="cart-item">
+                    <div class="p-image">
+                        <img src="<%=product.product_id.image%>" alt="<%=product.product_id.name%>" width="150px" height="150px">
+                    </div>
+                    <div class="p-title">
+                        <h2><%= product.product_id.name %></h2>
+                    </div>
+                    <div class="p-price">
+                        <p>$<%=product.product_id.price %></p>
+                    </div>
+                    <div class="p-quan">
+                        <button class="decrement-quantity" id="decrement-<%=product.id%>">-</button>
+                        <span style="align-self: center;" class="quantity" id="quantity-<%=product.id%>" quantity="<%= product.quantity %>"><%= product.quantity %></span><br>
+                        <button class="increment-quantity" id="increment-<%=product.id%>">+</button>
+                    </div>
+                    <div class="action-div">
+                        <button class="delete-button" id="<%=product.id%>" onclick="removeProduct(`<%= product.id %>`)">Delete</button>
+                        <!-- <button class="delete-button" id="<%=product.id%>">View Desc</button> -->
+                    </div>
+                </div>
+        <% }) %>
+        <% } %>
+    </div>
+    <div class="billing-container">
+        <table id="cart-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="cart-body">
+                <!-- Cart items will be dynamically generated here -->
+            </tbody>
+        </table>
+        <h3>Total: <span id="total-price">$0.00</span></h3>
+        <button  id="buy-now">Buy</button>
+    </div>
+
+    <script>
+        const BuyNowBtn=document.getElementById('buy-now');
+        const data=`<%- JSON.stringify(cartItems)%>`;
+        function removeProduct(id){
+            fetch("/cart/delete/"+id,{
+                method:"delete"
+            })
+            .then(res=>{
+                if(res.status==204)
+                    {
+                        document.getElementById(id).remove();
+                        calculateTotalPrice();
+                        updateBillingTable();
+                    }
+                else
+                    alert("somthing went wrong !")
+            })
+            .catch(err=>{console.log(err);})
+        }
+
+    cartItems= JSON.parse(`<%- JSON.stringify(cartItems) %>`);
+    // console.log(cartItems);
+ document.querySelectorAll('.increment-quantity').forEach(items => items.addEventListener('click', incrementQuantity));
+async function incrementQuantity() {
+    try {
+        const id = this.id;
+        const productId = id.split('-')[1];
+        let quantityEL = document.getElementById(`quantity-${productId}`);
+        quantity = quantityEL.textContent;
+        (quantity  < 5) ? quantity++ : quantity;
+        quantityEL.textContent = quantity;
+        for(i=0;i<cartItems.length;i++){
+            if(cartItems[i].id==id){
+                cartItems[i].splice(i,1);
+            }
+        }
+        calculateTotalPrice();
+        updateBillingTable(); // Update total price when quantity changes
+
+        await fetch(`/cart/product-quantity/${productId}/${quantity}`, {
+            method: 'put'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+document.querySelectorAll('.decrement-quantity').forEach(items => items.addEventListener('click', decrementQuantity));
+async function decrementQuantity() {
+    try {
+        const id = this.id;
+        const productId = id.split('-')[1];
+        let quantityEL = document.getElementById(`quantity-${productId}`);
+        quantity = quantityEL.textContent;
+        (quantity > 1) ? quantity-- : quantity;
+        quantityEL.textContent = quantity;
+        calculateTotalPrice(); 
+        updateBillingTable();// Update total price when quantity changes
+
+        await fetch(`/cart/product-quantity/${productId}/${quantity}`, {
+            method: 'put'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// document.querySelectorAll('.delete-button').forEach(items=>items.addEventListener('click',deleteItemFromCart));
+// async function deleteItemFromCart(){
+//     try {
+//         const id=this.id;
+//     await fetch(`/cart/delete/${id}`, {
+//         method:'delete'
+//     });
+//     const allItems=document.querySelectorAll('.cart-item');
+//     allItems.forEach((e)=>{
+//         if(e.id==id){
+//             e.innerHTML="";
+//         }
+//     })
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
+// Function to calculate the total price and update the billing table
+function calculateTotalPrice() {
+    const cartItemsList = document.querySelectorAll('.cart-item');
+    console.log(cartItemsList);
+    let totalPrice = 0;
+    let allCartProductIds=[];
+
+    cartItemsList.forEach(item => {
+        if(item.hasChildNodes){
+            allCartProductIds.push(Number(item.id));
+        const quantityElement = item.querySelector('.quantity');
+        const priceElement = item.querySelector('.p-price p');
+        const quantity = parseInt(quantityElement.textContent);
+        const price = parseFloat(priceElement.textContent.replace('$', ''));
+        totalPrice += quantity * price;
+        }
+    });
+// console.log(allCartProductIds);
+    // Update the total price displayed on the page
+    const totalPriceElement = document.getElementById('total-price');
+    totalPriceElement.textContent = '$' + totalPrice.toFixed(2);
+}
+
+// Function to update the billing table
+function updateBillingTable() {
+    const cartTable = document.getElementById('cart-table');
+    const cartBody = document.getElementById('cart-body');
+
+    // Clear the existing rows in the table
+    cartBody.innerHTML = '';
+    // console.log(cartItems)
+
+    // Iterate through cart items and add rows to the table
+    cartItems.forEach(product => {
+            const row = document.createElement('tr');
+        const titleCell = document.createElement('td');
+        const quantityCell = document.createElement('td');
+        const priceCell = document.createElement('td');
+
+        titleCell.textContent = product.product_id.name;
+        const productId = product.id;
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        let quantity,price;
+             quantity = parseInt(quantityElement.textContent);
+     
+         price = parseFloat(product.product_id.price);
+        quantityCell.textContent = quantity;
+        priceCell.textContent = '$' + (quantity * price).toFixed(2);
+       
+
+        row.appendChild(titleCell);
+        row.appendChild(quantityCell);
+        row.appendChild(priceCell);
+        cartBody.appendChild(row);
+   
+    });
+}
+
+// Add event listeners to increment and decrement buttons
+// document.querySelectorAll('.increment-quantity').forEach(items => items.addEventListener('click', incrementQuantity));
+// document.querySelectorAll('.decrement-quantity').forEach(items => items.addEventListener('click', decrementQuantity));
+
+// Initial calculation and table update
+calculateTotalPrice();
+updateBillingTable();
+
+BuyNowBtn.addEventListener('click',loadPlaceOrderPage);
+async function loadPlaceOrderPage(event){
+    const res= await fetch('cart/place-order'
+    );
+    if(res.ok){
+        console.log(res.url);
+        window.location.href=res.url;
+    }  
+}
+
+
+    </script>
+</body>
+</html>

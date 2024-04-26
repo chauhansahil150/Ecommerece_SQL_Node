@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+    <div class="container">
+        <div class="register-container">
+           <form class="register-form" action="register" method="post" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" name="name" id="name">
+                    <p id="nameError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email">
+                    <p id="emailError" class="error"></p>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password">
+                    <p id="passwordError" class="error"></p>
+                </div>
+                <div class="form-froup">
+                    <% if (locals.message) { %>
+                     <p id="msg" style="color: green;">
+                        <%= message %>
+                     </p>
+                     <%} else { %>
+                        <p id="msg" style="color:red;">
+                            <%= locals.error %>
+                         </p>
+                    <% } %>
+                </div>
+                <div class="form-link">
+                    <button type="submit">Register</button>
+                </div>
+                <div class="form-link">
+                    <p>Already have an account? <a href="/login">Login</a></p>
+                </div>
+           </form>
+        </div>
+    </div>
+    <script>
+        // Define the validation functions
+        function validateName() {
+            const name = document.getElementById('name').value;
+            const nameError = document.getElementById('nameError');
+            const msg=document.getElementById('msg');
+            nameError.textContent = '';
+
+            if (name.trim() === '') {
+                nameError.textContent = 'Name is required';
+            }else if(typeof msg!='undefined'){
+                msg.textContent='';
+            }
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailError = document.getElementById('emailError');
+            emailError.textContent = '';
+
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'Invalid email address';
+            }else if(typeof msg!='undefined'){
+                msg.textContent='';
+            }
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+            const numberRegex = /[0-9]/;
+            const capitalLetterRegex = /[A-Z]/;
+            const passwordError = document.getElementById('passwordError');
+            passwordError.textContent = '';
+
+            if (password.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters long';
+            } else if (!specialCharRegex.test(password) || !numberRegex.test(password) || !capitalLetterRegex.test(password)) {
+                passwordError.textContent = 'Password must contain special characters, numbers, and capital letters';
+            }else if(typeof msg!='undefined'){
+                msg.textContent='';
+            }
+        }
+
+        // Add event listeners to trigger validation while typing
+        document.getElementById('name').addEventListener('input', validateName);
+        document.getElementById('email').addEventListener('input', validateEmail);
+        document.getElementById('password').addEventListener('input', validatePassword);
+        
+        // Define the overall form validation function
+        function validateForm() {
+            validateName();
+            validateEmail();
+            validatePassword();
+
+            // Check if any errors exist
+            const errors = document.querySelectorAll('.error');
+            for (const error of errors) {
+                if (error.textContent !== '') {
+                    return false; // Prevent form submission if there are errors
+                }
+            }
+
+            return true; // Allow form submission if there are no errors
+        }
+    </script>
+</body>
+</html>

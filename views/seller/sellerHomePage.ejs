@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/nav.css">
+  <link rel="stylesheet" href="/css/sellerHomePage.css">
+  <title>Seller Page</title>
+  <style>
+    /* Add your CSS styling here */
+  </style>
+</head>
+<body>
+    <%- include('../partials/sellerNav', {name:name}) %>
+    <!-- <h1><%= seller_id %></h1> -->
+    <div class="conatiner-model">
+      <div class="container">
+      <h1 >Product Dashboard</h1>
+      
+      <div  class="products-container">
+        <!-- Products will be displayed here -->
+      </div>
+      <button onclick="loadMoreProducts()" id="load-more-button">Load more products</button>
+    </div>
+  <!-- Add this HTML structure within your <body> tag -->
+<script>
+  // Get all the navigation links
+ const links = document.querySelectorAll('.navbar a');
+
+   links.forEach((link) => {
+    if(link.innerHTML == 'Home'){
+      link.setAttribute('class','active');
+      return;
+    }
+  });
+</script>
+  <script>
+    
+    const productsContainer = document.querySelector('.products-container');
+    const loadMoreButton = document.getElementById('load-more-button');
+    // const userID = document.getElementById("user-name")?.getAttribute('class') || 'hello';
+    // console.log(userID);
+
+    let startIndex = 0;
+    let allProducts;
+    let allCartProducts;
+    // Function to fetch and display products
+    
+    async function fetchAndDisplayProducts() {
+      const res= await fetch(`/product/products?start=${startIndex}`)
+       
+      const data=await res.json();
+          if (!allProducts) {
+        allProducts = data;
+      } else {
+        allProducts = allProducts.concat(data);
+      }
+          data.forEach(product => {
+            // console.log(allProducts);
+            const productDiv = document.createElement('div');
+            // product.setAttribute('class','product')
+            productDiv.setAttribute('id',`${product.id}`)
+            productDiv.innerHTML =`
+            <p style="text-align:end">Status:${product.status}</P>
+              <br/>
+    <label for="name-${product.id}">Name:</label>
+    <input type="text" id="name-${product.id}" value="${product.name}">
+    
+    <label for="price-${product.id}">Price:$</label>
+    <input type="text" id="price-${product.id}" value="${product.price}">
+    
+    <label for="quantity-${product.id}">Quantity:</label>
+    <input type="text" id="quantity-${product.id}" value="${product.quantity}">
+
+    <img src="${product.image}" width='150px' height='150px' style="margin: 10px;" ></img>
+
+
+
+    
+    <label for="description-${product.id}">Description:</label>
+    <textarea style="resize: none;"id="description-${product.id}"  cols="30" rows="10" value="">${product.description}</textarea>
+    <div class="item-btn">
+        <button class="update-details-button" id="update-${product.id}" onClick='handleUpdate("${product.id}")'>Update</button>
+        <button class="delete-button" id="delete-${product.id}">Delete</button>
+    </div>
+`;
+// debugger;
+  productsContainer.appendChild(productDiv);
+          });
+          startIndex += 5;
+          // Add event listeners to all "Update" buttons
+    // document.querySelectorAll('.update-details-button').forEach(button => button.addEventListener('click', handleUpdate));;
+    document.querySelectorAll('.delete-button').forEach(button => button.addEventListener('click', handleDelete));;
+        }
+
+// Function to handle the update process
+async function handleUpdate(id) {
+    try {
+        // const id = event.currentTarget.id.split('-')[1];
+        console.log(`update clicked for ID: ${id}`);
+
+        // Get values from input fields
+        const name = getValue(`name-${id}`);
+        const price = getValue(`price-${id}`);
+        const quantity = getValue(`quantity-${id}`);
+        const description = getValue(`description-${id}`);
+
+        // Send update request to the server
+        const response = await updateProduct(id, { name, price, quantity, description });
+
+        // Handle the response (e.g., show a success message)
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+}
+// Function to handle the delete process
+async function handleDelete(event) {
+    try {
+        const id = event.currentTarget.id.split('-')[1];
+        console.log(`Delete clicked for ID: ${id}`);
+
+        // Send delete request to the server
+        const response = await deleteProduct(id);
+
+        // Handle the response (e.g., show a success message)
+        const data = await response.json();
+        if(data)
+        document.getElementById(id).innerHTML="";
+
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+}
+// Function to retrieve input field values by ID
+function getValue(id) {
+    return document.getElementById(id).value.trim();
+}
+
+
+// Function to update product details
+async function updateProduct(id, data) {
+    const url = `/product/${id}`;
+    const options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    };
+    return fetch(url, options);
+}
+async function deleteProduct(id) {
+    const url = `/product/${id}`;
+    const options = {
+        method: 'DELETE',
+         headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+    return fetch(url, options);
+}
+
+    
+    
+
+    // Function to load more products
+    function loadMoreProducts() {
+      fetchAndDisplayProducts();
+    }
+
+
+    // Initial load of products
+    fetchAndDisplayProducts();
+
+ 
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<nav class="navbar">
+  <span class="leftNavItems">
+    <% if (locals.role=='user') { %>
+      <a href="/user/dashboard">Home</a>
+      <a href="/user/orders">My-Orders</a>
+      <% } else if(locals.role=='admin') { %>
+      <a href="/admin/dashboard"> Home</a>
+     <a href="/product/add-new">Add-Product</a>
+     <a href="/admin/seller-request">Check-Seller-Requests</a>
+     <a href="/admin/product-request">Product-Requests</a>
+      <% } else if(locals.role=='seller') { %>
+      <a href="/seller/dashboard"> Home</a>
+     <a href="/product/add-new">Add-Product</a>
+     <!-- <a href="/admin/seller-request">Check-Seller-Requests</a> -->
+    
+    <% } %>  
+  </span>  
+  <span class="rightNavItems">
+    <% if (locals.name) { %>
+      <span class="<%= locals.userId %>" id="user-name">Hi, <%= name %></span>
+      <a href="/user/change-password">Change-Password</a>
+      <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    <% } %>
+    <!-- <a href="/">Profile</a> -->
+    <a href="/cart">Cart</a>
+
+    
+      
+  </span>
+</nav>
+<!-- <div id="notificationPopup" class="hidden">
+  <div style="display: flex; justify-content: space-between;">
+    <span>Chat Notification!</span>
+  <button style="padding: 3px;" id="closeNotification">X</button>
+  </div>
+ <div class="notification-bar">
+  <p id="hello">hi</p>
+  <p>sjkjs</p>
+  <p>jskjks</p>
+ </div> -->
+ 
+</div>
+
+<script>
+
+  // const showNotificationButton = document.getElementById('showNotification');
+  // const closeNotificationButton = document.getElementById('closeNotification');
+  // const notificationPopup = document.getElementById('notificationPopup');
+
+  // showNotificationButton.addEventListener('click', () => {
+  //     notificationPopup.style.right = '0';
+  //     notificationPopup.classList.remove('hidden');
+      
+  // });
+
+  // closeNotificationButton.addEventListener('click', () => {
+  //     notificationPopup.style.right = '-300px'; // Slide the popup off-screen
+  //     notificationPopup.classList.add('hidden');
+  // });
+</script>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/sellerRegister.css">
+    <script src="/scripts/sellerRegister.js" defer></script>
+    <title>Seller Registration</title>
+</head>
+<body>
+    <div class="container">
+        <div class="registration-form">
+            <h2>Seller Registration</h2>
+            <form  onsubmit="return validateForm()" id="registrationForm" action="/seller/register" method="post" enctype="multipart/form-data" >
+                <div class="form-group">
+                    <label for="fName">First Name:</label>
+                    <input type="text" id="fName" name="fName" >
+                    <p id="fnameError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="lName">Last Name:</label>
+                    <input type="text" id="lName" name="lName" >
+                    <p id="lnameError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender" >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" >
+                    <p id="emailError" class="error"></p>  
+
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" >
+                    <p id="passwordError" class="error"></p>  
+
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password:</label>
+                    <input type="password" name="confirm-password" id="confirm-password">
+                    <p id="confirm-password-error" class="error"></p>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile:</label>
+                    <input type="tel" id="mobile" name="mobile" >
+                    <p id="mobileError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" >
+                    <p id="dobError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="buisnessName">Business Name:</label>
+                    <input type="text" id="buisnessName" name="buisnessName" >
+                    <p id="buisnessNameError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="buisnessAddress">Business Address:</label>
+                    <textarea style="resize: none;" id="buisnessAddress" name="buisnessAddress" ></textarea>
+                    <p id="buisnessAddressError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="aadharNumber">Aadhar Number:</label>
+                    <input type="text" id="aadharNumber" name="aadharNumber" >
+                    <p id="aadharNumberError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="panNumber">PAN Number:</label>
+                    <input type="text" id="panNumber" name="panNumber" >
+                    <p id="panNumberError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="gstNumber">GST Number:</label>
+                    <input type="text" id="gstNumber" name="gstNumber" >
+                    <p id="gstNumberError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="aadharImage">Aadhar Image:</label>
+                    <input type="file" id="aadharImage" name="aadharImage" accept="image/*" >
+                    <p id="aadharImageError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="panImage">PAN Image:</label>
+                    <input type="file" id="panImage" name="panImage" accept="image/*" >
+                    <p id="panImageError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="storeImage">Store Image:</label>
+                    <input type="file" id="storeImage" name="storeImage" accept="image/*" >
+                    <p id="storeImageError" class="error"></p>  
+                </div>
+                <div class="form-group">
+                    <label for="profileImage">Profile Image:</label>
+                    <input type="file" id="profileImage" name="profileImage" accept="image/*"  multiple>
+                    <p id="profileImageError" class="error"></p>  
+                </div>
+                <p id="message" style="color: green;"><%= locals.message %></p>
+                <div class="form-group">
+                    <button style="margin-bottom: 15px;" type="submit">Submit</button>
+                </div>
+                <div class="form-group">
+                  <label>Already a seller?  <a href="/seller/login">Login</a></label>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

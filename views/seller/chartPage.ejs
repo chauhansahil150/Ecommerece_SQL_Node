@@ -1,0 +1,165 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart</title>
+    <link rel="stylesheet" href="/css/nav.css">
+         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.load('current', {'packages':['table']});
+      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawTable);
+      const productData = <%- JSON.stringify(productData) %>; // eslint-disable-line
+        // console.log(productData);
+        let chartData=[['Products','Quantities']];
+        let cancelledChartData=[['Products','Cancelled_counts']];
+        let returnedChartData=[['Products','returned_counts']];
+        let deliveredChartData=[['Products','delivered_counts']];
+        productData.forEach(element => {
+          chartData.push([element.name, element.quantity]);
+        });
+        const cancelledProducts=productData.filter((data)=> data.cancelled_counts>0);
+        console.log(cancelledProducts)
+        cancelledProducts.forEach(element => {
+          cancelledChartData.push([element.name,element.cancelled_counts])
+        });
+        const returnedProducts=productData.filter((data)=> data.returned_counts>0);
+                console.log(returnedProducts)
+
+         returnedProducts.forEach(element => {
+          returnedChartData.push([element.name,element.returned_counts]);
+        });
+        const placedProducts=productData.filter((data)=> data.placed_counts>0);
+        console.log(placedProducts);
+        const deliveredProducts=productData.filter((data)=> data.delivered_counts>0);
+        console.log(deliveredProducts);
+        deliveredProducts.forEach(element => {
+          deliveredChartData.push([element.name,element.delivered_counts]);
+        });
+        // console.log(chartData);
+      function drawChart() {
+        // var data = google.visualization.arrayToDataTable([
+        //   ['Products', 'Quantities'],
+        //   ['Work',     1],
+        //   ['Eat',      2],
+        //   ['Commute',  2],
+        //   ['Watch TV', 2],
+        // ]);
+
+        var data = google.visualization.arrayToDataTable(chartData)
+        var cancelledData = google.visualization.arrayToDataTable(cancelledChartData)
+        var returnedData = google.visualization.arrayToDataTable(returnedChartData)
+        var deliveredData = google.visualization.arrayToDataTable(deliveredChartData)
+        var options = {
+          title: 'Product Quantity'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        var cancelledChart = new google.visualization.PieChart(document.getElementById('cancelled_counts'));
+        var returnedChart = new google.visualization.PieChart(document.getElementById('returned_counts'));
+        var deliveredChart = new google.visualization.PieChart(document.getElementById('delivered_counts'));
+
+        chart.draw(data, options);
+        cancelledChart.draw(cancelledData, {
+          title: 'Cancelled Counts'
+        });
+        returnedChart.draw(returnedData, {
+          title: 'Returned Counts'
+        });
+        deliveredChart.draw(deliveredData, {
+          title: 'Delivered Counts'
+        });
+      }
+    tableData=[];
+    productData.forEach(element => {
+      tableData.push([element.name,element.cancelled_counts,element.returned_counts,element.delivered_counts]);
+      console.log(new Date(element.cancel_date));
+    });
+  function drawTable() {
+    var data = new google.visualization.DataTable();
+    var table = new google.visualization.Table(document.getElementById('table_div'));
+
+    data.addColumn('string', 'Product Name');
+    data.addColumn('number', 'Cancelled Count');
+    data.addColumn('number', 'Returned Count');
+    data.addColumn('number', 'Delivered Count');
+    // data.addColumn('date', 'Cancelled Date');
+    data.addRows(tableData);
+
+    var options = {
+        showRowNumber: true,
+        width: '100%',
+        height: '80%%'
+    };
+
+    // Add a dropdown (select element) to filter data
+    var select = document.createElement('select');
+    select.innerHTML = '<option value="all">All</option>' +
+                       '<option value="month">Month</option>' +
+                       '<option value="year">Year</option>';
+
+    // Append the select element to a div in your HTML
+    var selectDiv = document.getElementById('select_div');
+    // selectDiv.appendChild(select);
+
+    // Event listener for select element changes
+    select.addEventListener('change', function() {
+        var filterValue = select.value;
+        if (filterValue === 'all') {
+            table.draw(data, options);
+        } else {
+            // Filter data based on the selected value (month or year)
+            var filteredData = data.getFilteredRows([{column: 0, value: filterValue}]);
+            var filteredDataTable = new google.visualization.DataTable();
+            filteredDataTable.addColumn('string', 'Product Name');
+            filteredDataTable.addColumn('number', 'Cancelled Count');
+            filteredDataTable.addColumn('number', 'Returned Count');
+            filteredDataTable.addColumn('number', 'Delivered Count');
+            filteredDataTable.addRows(filteredData);
+            table.draw(filteredDataTable, options);
+        }
+    });
+
+    table.draw(data, options);
+}
+
+    </script>
+    <style>
+      .pie-chart-container{
+        width: 100%;
+        flex-direction: row;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      </style>
+</head>
+<body>
+    <%- include('../partials/sellerNav', {name,role}) %>
+
+  <div class="pie-chart-container">
+    <div id="piechart" style="width: 750px; height: 500px;"></div>
+    <div id="cancelled_counts" style="width: 750px; height: 500px;"></div>
+    <div id="returned_counts" style="width: 750px; height: 500px;"></div>
+    <div id="delivered_counts" style="width: 750px; height: 500px;"></div>
+  </div>
+  <div id="select_div">
+
+  </div>
+    <div id="table_div"></div>
+<script>
+  // Get all the navigation links
+ const links = document.querySelectorAll('.navbar a');
+
+   links.forEach((link) => {
+    if(link.innerHTML == 'Chart'){
+      link.setAttribute('class','active');
+      return;
+    }
+  });
+</script>
+<script>
+   
+</script>
+</body>
+</html>

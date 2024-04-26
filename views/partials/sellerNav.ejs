@@ -1,0 +1,18 @@
+<nav class="navbar">
+  <span class="leftNavItems">
+    <a href="/seller/dashboard">Home</a>
+    <a href="/product/add-new">Add-Product</a>
+    <a href="/seller/customer-placed-order">Placed-orders</a>
+    <a href="/seller/chart">Chart</a>
+  </span>
+  <span class="rightNavItems">
+    <% if (locals.name) { %>
+    <span class="<%= locals.userId %>" id="user-name">Hi, <%= name %></span>
+    <!-- <a href="/user/change-password">Change-Password</a> -->
+    <a href="/logout">Logout</a>
+    <% } else { %>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+    <% } %>
+  </span>
+</nav>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body><form action="/user/forgot-password" method="post" onsubmit="return validateForm()">
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email">
+        <p id="emailError" class="error"></p>
+    </div>
+    <div class="form-link">
+        <button type="submit">Click</button>
+    </div>
+    <div class="form-link">
+        <p id="message" style="color: green;"><%= locals.message %></p>
+    </div>
+
+</form>
+
+    <script>
+        const message=document.getElementById('message');
+        function validateEmail(){
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailError=document.getElementById('emailError');
+            emailError.innerHTML='';
+
+            if(!emailRegex.test(email)){
+                emailError.innerHTML='invalid email address';
+            }
+
+        }
+        document.getElementById('email').addEventListener('input', validateEmail);
+        function validateForm(){
+            message.textContent='';
+
+            validateEmail();
+
+            const errors = document.querySelectorAll('.error');
+            for (const error of errors) {
+                if (error.textContent !== '') {
+                    return false; // Prevent form submission if there are errors
+                }
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

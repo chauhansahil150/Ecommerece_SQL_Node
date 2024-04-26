@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/login.css">
+    <title>Seller Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h3 style="text-align: center;">Transporter Login</h3>
+            <form class="login-form" action="/transporter/login" method="post" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email">
+                    <p id="emailError" class="error"></p>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password">
+                </div>
+                    <p id="error" style="color: red;" class="error"><%= locals.error %></p>
+                <div class="form-link">
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+            <div class="form-link">
+                <p>Forgot Password? <a href="/user/forgot-password">Click</a></p>
+            </div>
+            <div class="form-link">
+                <p>User Login <a href="/login">Click</a></p>
+            </div>
+            <div class="form-link">
+                <p>Seller Login <a href="/seller/login">Click</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validateEmail() {
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailError = document.getElementById('emailError');
+            const error=document.getElementById('error');
+            emailError.textContent = '';
+
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'Invalid email address';
+                emailError.style.color="red";
+            }else{
+                emailError.textContent='';
+                error.textContent='';
+                
+            }
+        }
+        document.getElementById('email').addEventListener('input', validateEmail);
+
+         function validateForm() {
+            
+            validateEmail();
+            
+
+            // Check if any errors exist
+            const errors = document.querySelectorAll('.error');
+            for (const error of errors) {
+                if (error.textContent !== '') {
+                    return false; // Prevent form submission if there are errors
+                }
+            }
+
+            return true; // Allow form submission if there are no errors
+        }
+    </script>
+
+</body>
+</html>

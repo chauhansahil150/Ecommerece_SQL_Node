@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+   .container {
+    position: relative;
+    text-align: center;
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+   
+    /* Add any other container styles you need */
+}
+.seller_container{
+    border: 1px solid black;
+    background-color: aliceblue;
+    width: 16%;
+    padding: 10px;
+    margin: 5px;
+
+}
+
+.pop-up {
+    display: none;
+    position: absolute;
+    top: 5%; /* Center vertically */
+    /* left: 50%; /* Center horizontally */
+    /* transform: translate(-50%, -50%); Center the pop-up both horizontally and vertically */ 
+    padding: 20px; /* Add padding for content */
+    background-color: white; /* Set the background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a shadow for a visual effect */
+    z-index: 9999; /* Ensure the pop-up appears above other elements */
+    /* Add any other styles you need */
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <% if (locals.allSellersData.length>0) { %>
+         <% allSellersData.forEach(seller => { %>
+            <div class="seller_container" id="<%= seller.seller_id %>">
+                <p> Name: <%= seller.f_name %> <%= seller.l_name %></p>
+                <p>Gender: <%= seller.gender %></p>
+                <p>Email: <%= seller.email %></p>
+                <p>Mobile No: <%= seller.mobile_no %></p>
+                <p style="display:none;" >Date of Birth: <%= seller.dob %></p>
+                <p style="display:none;" >Business Name: <%= seller.business_name %></p>
+                <p style="display:none;" >Business Address: <%= seller.business_address %></p>
+                <p style="display:none;" >Aadhar No: <%= seller.aadhar_no %></p>
+                <p style="display:none;" >PAN No: <%= seller.pan_no %></p>
+                <p style="display:none;" >GST No: <%= seller.gst_no %></p>
+                
+                <!-- You can include image tags for the image URLs if needed  -->
+                <img  style="display:none;" src="<%= seller.aadhar_image %>" alt="Aadhar Image">
+                <img  style="display:none;" src="<%= seller.pan_image %>" alt="PAN Image">
+                <img  style="display:none;" src="<%= seller.profile_image %>" alt="Profile Image">
+                <img  style="display:none;" src="<%= seller.store_image %>" alt="Store Image">
+                
+              <button onclick="handleReject(`<%= seller.seller_id %>`)" class="reject-details-button" id="reject-<%= seller.seller_id %>" onClick='handlereject("${product.id}")'>Reject</button>
+            <button onclick="handleApprove(`<%= seller.seller_id %>`)" class="approve-button" id="approve-<%= seller.seller_id %>">Approve</button>
+            <button   class="viewDescription-button" id="viewDescription-<%= seller.seller_id %>">View-Description</button>
+            </div>
+        <% }) %>
+        <% } else { %>
+         <p>No Request Yet</p>
+        <% } %>
+    </div>
+    <div class="pop-up">
+       .
+    </div>
+
+  <script>
+
+   document.addEventListener('DOMContentLoaded', function () {
+  // Get the elements
+  const viewDescriptionButtons = document.querySelectorAll('.viewDescription-button');
+  const popUp = document.querySelector('.pop-up');
+
+  // Add click event listeners to each "View-Description" button
+  viewDescriptionButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      // Get the seller container associated with the button
+      const sellerContainer = this.closest('.seller_container');
+      console.log(sellerContainer);
+
+      // Get the user details from the seller container
+      const name = sellerContainer.querySelector('p:first-child').textContent;
+      const gender = sellerContainer.querySelector('p:nth-child(2)').textContent;
+      const email = sellerContainer.querySelector('p:nth-child(3)').textContent;
+      const mobile_no = sellerContainer.querySelector('p:nth-child(4)').textContent;
+      const dob = sellerContainer.querySelector('p:nth-child(5)').textContent;
+      const business_name = sellerContainer.querySelector('p:nth-child(6)').textContent;
+      const business_address = sellerContainer.querySelector('p:nth-child(7)').textContent;
+      const aadhar_no = sellerContainer.querySelector('p:nth-child(8)').textContent;
+      const pan_no = sellerContainer.querySelector('p:nth-child(9)').textContent;
+      const gst_no = sellerContainer.querySelector('p:nth-child(10)').textContent;
+const aadhar_image = sellerContainer.querySelector('img:nth-child(11)').getAttribute('src');
+const pan_image = sellerContainer.querySelector('img:nth-child(12)').getAttribute('src');
+const profile_image = sellerContainer.querySelector('img:nth-child(13)').getAttribute('src');
+const store_image = sellerContainer.querySelector('img:nth-child(14)').getAttribute('src');
+    //   const gst_no = sellerContainer.querySelector('p:nth-child(12)').textContent;
+
+      // Populate the popup with user details
+      popUp.innerHTML = `
+        <div class="popup-content">
+          <h2>User Details</h2>
+          <p>${name}</p>
+          <p>${gender}</p>
+          <p>${email}</p>
+          <p>${mobile_no}</p>
+          <p>${dob}</p>
+          <p>${business_name}</p>
+          <p>${business_address}</p>
+          <p>${aadhar_no}</p>
+          <p>${pan_no}</p>
+          <p>${gst_no}</p>
+          Aadhar-Image<img src="${aadhar_image}"/>
+          Pan-Image<img src="${pan_image}"/>
+          Profile-Image<img src="${profile_image}"/>
+          Store-Image<img src="${store_image}"/>
+
+        </div>
+        <button class="close-button">Close</button>
+      `;
+
+      // Show the popup
+      popUp.style.display = 'block';
+
+      // Add click event listener to the close button
+      const closeButton = popUp.querySelector('.close-button');
+      closeButton.addEventListener('click', function () {
+        // Hide the popup when the close button is clicked
+        popUp.style.display = 'none';
+      });
+    });
+  });
+
+});
+
+  async function handleReject(id){
+    // console.log(typeof(id));
+    const response = await rejectSeller(id);
+    if(response.ok);{
+      document.getElementById(id).remove();
+  }
+}
+async function handleApprove(id){
+ const response = await approveSeller(id);
+    if(response.ok){
+      document.getElementById(`approve-${id}`).innerText="Approved"
+       setTimeout((req,res)=>{
+        document.getElementById(id).remove();
+    },500);
+
+    }
+}
+async function rejectSeller(id){
+    return fetch(`/admin/seller/reject/${id}`);
+}
+async function approveSeller(id){
+  return fetch(`/admin/seller/approve/${id}`);
+}
+
+  </script>
+</body>
+</html>

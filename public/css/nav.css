@@ -1,0 +1,84 @@
+  /* Base styles for the navbar */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .navbar {
+    background-color: black;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    font-family: Arial, sans-serif;
+  }
+
+  .navbar a {
+    padding: 9px;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: bold;
+  }
+
+  .navbar a:hover {
+    color: black;
+    background-color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: bold;
+  }
+
+  /* Responsive styles */
+  @media screen and (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .navbar a {
+      margin: 5px 0;
+    }
+
+    .rightNavItems {
+      margin-top: 20px;
+    }
+
+    /* Show the Role and Dept only for resolver role in small screens */
+    .leftNavItems a:nth-child(4),
+    .leftNavItems a:nth-child(5) {
+      display: block;
+      pointer-events: auto;
+      margin: 5px 0;
+    }
+  }
+
+  /* Styles for the notification popup */
+  #notificationPopup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 999;
+  }
+
+  .notification-bar {
+    margin-top: 10px;
+  }
+
+  /* Media query for small screens */
+  @media screen and (max-width: 768px) {
+    #notificationPopup {
+      width: 100%;
+    }
+  }
+
+  /* Add a new class to style the active link */
+  .navbar .active {
+    background-color: white;
+    color:black;
+  }

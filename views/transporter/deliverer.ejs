@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Page</title>
+    <link rel="stylesheet" href="css/nav.css">
+    <style>
+   .container {
+    position: relative;
+    text-align: center;
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+   
+    /* Add any other container styles you need */
+}
+.order_container{
+    border: 1px solid black;
+    background-color: aliceblue;
+    width: 16%;
+    padding: 10px;
+    margin: 5px;
+
+}
+
+.pop-up {
+    display: none;
+    position: absolute;
+    top: 5%; /* Center vertically */
+    /* left: 50%; /* Center horizontally */
+    /* transform: translate(-50%, -50%); Center the pop-up both horizontally and vertically */ 
+    padding: 20px; /* Add padding for content */
+    background-color: white; /* Set the background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a shadow for a visual effect */
+    z-index: 9999; /* Ensure the pop-up appears above other elements */
+    /* Add any other styles you need */
+}
+.order_container
+.bottom{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+.order_container
+.bottom
+button{
+    cursor: pointer;
+    margin-top: 10px;
+        padding: 10px;
+        background-color: black;
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+
+}
+.order_container
+.bottom
+button:hover{
+    cursor: pointer;
+    margin-top: 10px;
+        padding: 10px;
+        background-color: white;
+        color: black;
+        font-family: 'Courier New', Courier, monospace;
+
+}
+    </style>
+</head>
+<body>
+        <%- include('../partials/transporterNav.ejs') %>
+
+  <div class="container">
+        <% if (locals.allOrders.length>0) { %>
+         <% allOrders.forEach(order => { %>
+            <div class="order_container" id="<%= order.order_id %>">
+          <p> Order Id: <%= order.order_id %></p>
+           <p> Payment Mode: <%= order.payment_mode %></p>
+        <p> Total Amount: $<%= order.total_amount %></p>
+        <p> Name: <%= order.name %></p>
+        <p> Phone: <%= order.phone %></p>
+        <p> Address: <%= order.address %></p>
+        <p> City: <%= order.city %></p>
+        <p> State:  <%= order.state %></p>
+        <p> Pincode:  <%= order.zipcode %></p>
+       
+        <!-- Add any other desired fields here -->
+        <br>
+         <div class="bottom">
+                   <label for="order_status">Order Status</label>
+                 <select name="order_status" id="order_status<%= order.order_id %>">
+                    <option value="cancelled">cancelled</option>
+                    <option value="returned">returned</option>
+                    <option value="delivered">delivered</option>
+                </select>
+                <!-- <button onclick="handleApprove(`<%= order.order_id %>`)" class="approve-button" id="approve-<%= order.order_id %>">Approve</button> -->
+                <!-- <button   class="viewDescription-button" id="viewDescription-<%= order.order_id %>">View-Description</button> -->
+            </div>
+            <div class="bottom">
+                 <button onclick="handleDispatch(`<%= order.order_id %>`)" class="dispatch-details-button" id="dispatch-<%= order.order_id %>" >Submit</button>
+
+            </div>
+      </div>
+    <% }) %>
+        <% } else { %>
+         <p>No Request Yet</p>
+        <% } %>
+    </div>
+
+  <script>
+ 
+   document.addEventListener('DOMContentLoaded', function () {
+  // Get the elements
+  const viewDescriptionButtons = document.querySelectorAll('.viewDescription-button');
+  const popUp = document.querySelector('.pop-up');
+
+  // Add click event listeners to each "View-Description" button
+  viewDescriptionButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      // Get the order container associated with the button
+      const orderContainer = this.closest('.order_container');
+      console.log(orderContainer);
+
+      // Get the user details from the order container
+      const name = orderContainer.querySelector('p:first-child').textContent;
+      const description = orderContainer.querySelector('p:nth-child(2)').textContent;
+      const price = orderContainer.querySelector('p:nth-child(3)').textContent;
+      const mobile_no = orderContainer.querySelector('p:nth-child(4)').textContent;
+      const dob = orderContainer.querySelector('p:nth-child(5)').textContent;
+      const business_name = orderContainer.querySelector('p:nth-child(6)').textContent;
+
+    //   const gst_no = orderContainer.querySelector('p:nth-child(12)').textContent;
+
+      // Populate the popup with user details
+      popUp.innerHTML = `
+        <div class="popup-content">
+          <h2>Details</h2>
+          <p>${name}</p>
+          <p>${description}</p>
+          <p>${price}</p>
+          <p>${mobile_no}</p>
+          <p>${dob}</p>
+          <p>${business_name}</p>
+        </div>
+        <button class="close-button">Close</button>
+      `;
+
+      // Show the popup
+      popUp.style.display = 'block';
+
+      // Add click event listener to the close button
+      const closeButton = popUp.querySelector('.close-button');
+      closeButton.addEventListener('click', function () {
+        // Hide the popup when the close button is clicked
+        popUp.style.display = 'none';
+      });
+    });
+  });
+});
+
+  async function handleDispatch(id){
+    // console.log(typeof(id));
+    console.log(id);
+       const orderStatus=document.getElementById(`order_status${id}`).value;
+    console.log(orderStatus);
+    const response = await dispatchOrder(id,orderStatus);
+    console.log(response);
+    const data=await response.json();
+    console.log(data);
+    if(data.success){
+      alert('order ' + orderStatus + ' successfully');
+      document.getElementById(id).remove();
+  }
+}
+// async function handleApprove(id){
+//  const response = await approveorder(id);
+//     if(response.ok){
+//       document.getElementById(`approve-${id}`).innerText="Approved"
+//        setTimeout((req,res)=>{
+//         document.getElementById(id).remove();
+//     },500);
+
+//     }
+// }
+async function dispatchOrder(id,orderStatus){
+    return await fetch(`/transporter/order/status/${id}-${orderStatus}`,{
+        method:'put',
+    });
+}
+// async function approveorder(id){
+//   return fetch(`/admin/order/approve/${id}`);
+// }
+
+  </script>
+</body>
+</html>

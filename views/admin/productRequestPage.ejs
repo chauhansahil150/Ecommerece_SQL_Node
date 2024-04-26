@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+   .container {
+    position: relative;
+    text-align: center;
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+   
+    /* Add any other container styles you need */
+}
+.product_container{
+    border: 1px solid black;
+    background-color: aliceblue;
+    width: 16%;
+    padding: 10px;
+    margin: 5px;
+
+}
+
+.pop-up {
+    display: none;
+    position: absolute;
+    top: 5%; /* Center vertically */
+    /* left: 50%; /* Center horizontally */
+    /* transform: translate(-50%, -50%); Center the pop-up both horizontally and vertically */ 
+    padding: 20px; /* Add padding for content */
+    background-color: white; /* Set the background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a shadow for a visual effect */
+    z-index: 9999; /* Ensure the pop-up appears above other elements */
+    /* Add any other styles you need */
+}
+
+    </style>
+</head>
+<body>
+    <%- include('../partials/nav') %>
+    <div class="container">
+        <% if (locals.allProductsData.length>0) { %>
+         <% allProductsData.forEach(product => { %>
+            <div class="product_container" id="<%= product.id %>">
+                <p> Name: <%= product.name %></p>
+                <p>Description: <%= product.description %></p>
+                <p>Price: <%= product.price %></p>
+                <p>Quantity: <%= product.quantity %></p>
+                <p style="display:none;" >Date of Birth: <%= product.dob %></p>
+                <p style="display:none;" >Business Name: <%= product.business_name %></p>
+                <p style="display:none;" >Business Address: <%= product.business_address %></p>
+                <p style="display:none;" >Aadhar No: <%= product.aadhar_no %></p>
+                <p style="display:none;" >PAN No: <%= product.pan_no %></p>
+                <p style="display:none;" >GST No: <%= product.gst_no %></p>
+                
+                <!-- You can include image tags for the image URLs if needed  -->
+                <img  src="<%= product.image %>" alt="Aadhar Image" width="150px" height="150px">
+                <img  style="display:none;" src="<%= product.pan_image %>" alt="PAN Image">
+                <img  style="display:none;" src="<%= product.profile_image %>" alt="Profile Image">
+                <img  style="display:none;" src="<%= product.store_image %>" alt="Store Image">
+                <br>
+                
+              <button onclick="handleReject(`<%= product.id %>`)" class="reject-details-button" id="reject-<%= product.id %>" >Reject</button>
+            <button onclick="handleApprove(`<%= product.id %>`)" class="approve-button" id="approve-<%= product.id %>">Approve</button>
+            <!-- <button   class="viewDescription-button" id="viewDescription-<%= product.product_id %>">View-Description</button> -->
+            </div>
+        <% }) %>
+        <% } else { %>
+         <p>No Request Yet</p>
+        <% } %>
+    </div>
+    <div class="pop-up">
+       .
+    </div>
+
+  <script>
+
+   document.addEventListener('DOMContentLoaded', function () {
+  // Get the elements
+  const viewDescriptionButtons = document.querySelectorAll('.viewDescription-button');
+  const popUp = document.querySelector('.pop-up');
+
+  // Add click event listeners to each "View-Description" button
+  viewDescriptionButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      // Get the product container associated with the button
+      const productContainer = this.closest('.product_container');
+      console.log(productContainer);
+
+      // Get the user details from the product container
+      const name = productContainer.querySelector('p:first-child').textContent;
+      const description = productContainer.querySelector('p:nth-child(2)').textContent;
+      const price = productContainer.querySelector('p:nth-child(3)').textContent;
+      const mobile_no = productContainer.querySelector('p:nth-child(4)').textContent;
+      const dob = productContainer.querySelector('p:nth-child(5)').textContent;
+      const business_name = productContainer.querySelector('p:nth-child(6)').textContent;
+      const business_address = productContainer.querySelector('p:nth-child(7)').textContent;
+      const aadhar_no = productContainer.querySelector('p:nth-child(8)').textContent;
+      const pan_no = productContainer.querySelector('p:nth-child(9)').textContent;
+      const gst_no = productContainer.querySelector('p:nth-child(10)').textContent;
+const aadhar_image = productContainer.querySelector('img:nth-child(11)').getAttribute('src');
+const pan_image = productContainer.querySelector('img:nth-child(12)').getAttribute('src');
+const profile_image = productContainer.querySelector('img:nth-child(13)').getAttribute('src');
+const store_image = productContainer.querySelector('img:nth-child(14)').getAttribute('src');
+    //   const gst_no = productContainer.querySelector('p:nth-child(12)').textContent;
+
+      // Populate the popup with user details
+      popUp.innerHTML = `
+        <div class="popup-content">
+          <h2>User Details</h2>
+          <p>${name}</p>
+          <p>${description}</p>
+          <p>${price}</p>
+          <p>${mobile_no}</p>
+          <p>${dob}</p>
+          <p>${business_name}</p>
+          <p>${business_address}</p>
+          <p>${aadhar_no}</p>
+          <p>${pan_no}</p>
+          <p>${gst_no}</p>
+          Aadhar-Image<img src="${aadhar_image}"/>
+          Pan-Image<img src="${pan_image}"/>
+          Profile-Image<img src="${profile_image}"/>
+          Store-Image<img src="${store_image}"/>
+
+        </div>
+        <button class="close-button">Close</button>
+      `;
+
+      // Show the popup
+      popUp.style.display = 'block';
+
+      // Add click event listener to the close button
+      const closeButton = popUp.querySelector('.close-button');
+      closeButton.addEventListener('click', function () {
+        // Hide the popup when the close button is clicked
+        popUp.style.display = 'none';
+      });
+    });
+  });
+
+});
+
+  async function handleReject(id){
+    // console.log(typeof(id));
+    const response = await rejectproduct(id);
+    if(response.ok);{
+      document.getElementById(id).remove();
+  }
+}
+async function handleApprove(id){
+ const response = await approveproduct(id);
+    if(response.ok){
+      document.getElementById(`approve-${id}`).innerText="Approved"
+       setTimeout((req,res)=>{
+        document.getElementById(id).remove();
+    },500);
+
+    }
+}
+async function rejectproduct(id){
+    return fetch(`/admin/product/reject/${id}`);
+}
+async function approveproduct(id){
+  return fetch(`/admin/product/approve/${id}`);
+}
+
+  </script>
+</body>
+</html>
